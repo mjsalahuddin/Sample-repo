@@ -28,3 +28,67 @@ pipeline {
         }
     }
 }
+
+//This is a sample CICD Pipeline code for one of the tactics-production repo projects 
+#!/usr/bin/env groovy
+
+// Deployment pipeline for tactics production repo
+
+pipeline {
+    agent any
+    options {
+        //skipDefaultCheckout(true)
+        skipStagesAfterUnstable()
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                cleanWs()
+                // uses the credentials built into the job on Jenkins
+                //checkout scm
+            }
+        }
+        stage('Build SBB packages') {
+            steps {
+                echo 'Building the SBB packages'
+                // Cython/Cython GSL are installed in the base global Anaconda env
+                // Other Python packages are only installed in the env for modules that are executed (cron'd)
+                //sh './build_sbb_pkgs.sh'
+            }
+        }
+        stage('Build conda envs for apps') {
+            steps {
+                echo 'Build conda envs for apps'
+                //sh './build_conda_envs.sh -p api'
+                //sh './link_sbb_pkgs.sh'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Running the tests'
+                //sh './run_pytest.sh -p api'
+            }
+        }
+    }
+    // "always" is first in the postbuild steps.
+    // Can't clean before a successful build can copy files over
+    post {
+        always {
+            echo 'Jenkins pipeline finished!'
+            //junit 'test-reports/*.xml'
+        }
+        success {
+            echo 'Build was successful'
+            
+                }
+                }
+            }
+        //unstable {
+            //echo 'Unstable compilation or failed tests'
+        //}
+        //failure {
+            //echo 'Failed'
+        //}
+        //cleanup {
+            //cleanWs()
+        //}
